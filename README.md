@@ -1,5 +1,7 @@
 # ComportexViz
 
+# THIS IS A HACK BRANCH. IT WILL NOT BE MERGED.
+
 A web-based visualization layer for
 [Comportex](http://github.com/nupic-community/comportex/).
 

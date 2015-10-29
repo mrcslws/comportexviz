@@ -7,11 +7,6 @@
                                                   map->ThreeDTopology]])
   (:require-macros [cljs.core.async.macros :refer [go go-loop alt!]]))
 
-(def handlers
-  {"org.nfrac.comportex.topology.OneDTopology" map->OneDTopology
-   "org.nfrac.comportex.topology.TwoDTopology" map->TwoDTopology
-   "org.nfrac.comportex.topology.ThreeDTopology" map->ThreeDTopology})
-
 ;; Jetty's maxTextMessageBufferSize
 (def max-message-size
   (* 64 1024))
@@ -23,13 +18,14 @@
 
 (defn read-transit-str
   [s extra-handlers]
-  (-> (transit/reader :json {:handlers (merge handlers
-                                              extra-handlers)})
+  (-> (transit/reader :json {:handlers extra-handlers})
       (transit/read s)))
 
 (defn target-put
   [target v]
-  [target :put! v])
+  (let [m [target :put! v]]
+    (println "SENDING:" m)
+    m))
 
 (defn target-close
   [target]
@@ -94,6 +90,7 @@
                   :put! (do
                           ;; enumerate lazy tree
                           ;; (dorun (tree-seq coll? seq msg))
+                          (println "RECEIVED:" target op msg)
                           (put! ch msg))
                   :close! (close! ch))))))))
 

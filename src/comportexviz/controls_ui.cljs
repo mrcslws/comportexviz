@@ -839,10 +839,11 @@
 (defn comportexviz-app
   [_ _ _ selection steps step-template _ _ _ into-journal local-targets]
   (let [show-help (atom false)
-        viz-expanded (atom false)
-        time-plots-tab (time-plots-tab-builder steps into-journal local-targets)
-        cell-sdrs-tab (cell-sdrs-tab-builder steps step-template selection
-                                             into-journal local-targets)]
+        viz-expanded (atom true)
+        ;; time-plots-tab (time-plots-tab-builder steps into-journal local-targets)
+        ;; cell-sdrs-tab (cell-sdrs-tab-builder steps step-template selection
+        ;;                                      into-journal local-targets)
+        ]
     (fn [model-tab main-pane viz-options selection steps step-template
          series-colors into-viz into-sim into-journal local-targets]
       [:div
@@ -858,12 +859,13 @@
            (into (if model-tab
                    [[:model model-tab]]
                    [])
-                 [[:drawing [bind-fields viz-options-template viz-options]]
-                  [:params [parameters-tab step-template selection into-sim
-                            local-targets]]
-                  [:time-plots [time-plots-tab series-colors]]
-                  [:cell-SDRs [cell-sdrs-tab]]
-                  [:sources [sources-tab step-template selection series-colors
-                             into-journal local-targets]]
-                  [:details [details-tab selection into-journal local-targets]]])]]]
+                 [;; [:drawing [bind-fields viz-options-template viz-options]]
+                  ;; [:params [parameters-tab step-template selection into-sim
+                  ;;           local-targets]]
+                  ;; [:time-plots [time-plots-tab series-colors]]
+                  ;; [:cell-SDRs [cell-sdrs-tab]]
+                  ;; [:sources [sources-tab step-template selection series-colors
+                  ;;            into-journal local-targets]]
+                  ;; [:details [details-tab selection into-journal local-targets]]
+                  ])]]]
         [:div#loading-message "loading"]]])))
