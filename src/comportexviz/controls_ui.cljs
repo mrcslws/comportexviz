@@ -407,6 +407,78 @@
             "Dump entire model to console"])
          ])})))
 
+(def keep-steps-template
+  [:div.panel.panel-default
+   [:div.panel-body
+    [:div
+     [:label " Keep "
+      [:input {:field :numeric
+               :id :keep-steps
+               :size 4}]
+      " steps of history"]]]])
+
+(defn t-chbox
+  [id label]
+  [:div.checkbox
+   [:label
+    [:input {:field :checkbox :id id}]
+    (str " " label)]])
+
+(def capture-ff-syns-template
+  [:div
+   (t-chbox :ff-synapses.active? "Active")
+   (t-chbox :ff-synapses.inactive? "Inactive")
+   (t-chbox :ff-synapses.disconnected? "Disconnected")])
+
+(def capture-distal-syns-template
+  [:div
+   (t-chbox :distal-synapses.active? "Active")
+   (t-chbox :distal-synapses.inactive? "Inactive")
+   (t-chbox :distal-synapses.disconnected? "Disconnected")])
+
+(defn capture-tab [capture-options]
+  (let [group (fn [title content]
+                [:div.col-sm-6
+                 [:div.panel.panel-default
+                  [:div.panel-heading
+                   [:h4.panel-title title]]
+                  content]])]
+    (fn [capture-options]
+      (let [{{capture-ff-syns? :capture?} :ff-synapses
+             {capture-distal-syns? :capture?} :distal-synapses} @capture-options]
+        [:div
+         [bind-fields keep-steps-template capture-options]
+         [:p.text-muted "Select the model data to capture."]
+         [:div.col-sm-6 {:style {:padding-left 0}}
+          [:div.panel.panel-default
+           [:div.panel-heading
+            [:h4.panel-title "Feedforward synapses:"]]
+           [:div.panel-body
+            [(if capture-ff-syns?
+               :button.btn.btn-primary
+               :button.btn.btn-default)
+             {:on-click #(swap! capture-options
+                                update-in [:ff-synapses :capture?] not)}
+             (if capture-ff-syns?
+               "Capturing"
+               "Not capturing")]
+            [bind-fields capture-ff-syns-template capture-options]]]]
+         [:div.col-sm-6 {:style {:padding-right 0}}
+          [:div.panel.panel-default
+           [:div.panel-heading
+            [:h4.panel-title "Distal synapses:"]]
+           [:div.panel-body
+            [(if capture-distal-syns?
+               :button.btn.btn-primary
+               :button.btn.btn-default)
+             {:on-click #(swap! capture-options
+                                update-in [:distal-synapses :capture?] not)
+              :style {:margin-right 10}}
+             (if capture-distal-syns?
+               "Capturing"
+               "Not capturing")]
+            [bind-fields capture-distal-syns-template capture-options]]]]]))))
+
 (def viz-options-template
   (let [chbox (fn [id label]
                 [:div.checkbox
@@ -423,12 +495,6 @@
      [:p.text-muted "Select drawing options, with immediate effect."]
      [:div.panel.panel-default
       [:div.panel-body
-       [:div
-        [:label " Keep "
-         [:input {:field :numeric
-                  :id :keep-steps
-                  :size 4}]
-         " steps of history"]]
        [:div.radio
         [:label
          [:input {:field :radio
@@ -837,15 +903,16 @@
      [:hr]]))
 
 (defn comportexviz-app
-  [_ _ _ selection steps step-template _ _ _ into-journal local-targets]
+  [_ _ _ _ selection steps step-template _ _ _ into-journal local-targets]
   (let [show-help (atom false)
         viz-expanded (atom true)
         ;; time-plots-tab (time-plots-tab-builder steps into-journal local-targets)
         ;; cell-sdrs-tab (cell-sdrs-tab-builder steps step-template selection
         ;;                                      into-journal local-targets)
         ]
-    (fn [model-tab main-pane viz-options selection steps step-template
-         series-colors into-viz into-sim into-journal local-targets]
+    (fn [model-tab main-pane capture-options viz-options selection steps
+         step-template series-colors into-viz into-sim into-journal
+         local-targets]
       [:div
        [navbar steps show-help viz-options viz-expanded step-template into-viz
         into-sim local-targets]
@@ -859,7 +926,8 @@
            (into (if model-tab
                    [[:model model-tab]]
                    [])
-                 [;; [:drawing [bind-fields viz-options-template viz-options]]
+                 [[:capture [capture-tab capture-options]]
+                  [:drawing [bind-fields viz-options-template viz-options]]
                   ;; [:params [parameters-tab step-template selection into-sim
                   ;;           local-targets]]
                   ;; [:time-plots [time-plots-tab series-colors]]

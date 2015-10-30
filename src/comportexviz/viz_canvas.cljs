@@ -84,7 +84,6 @@
                      :inactive nil
                      :disconnected nil
                      :permanences true}
-   :keep-steps 50
    ;; triggers a rebuild & redraw of the layouts when changed:
    :drawing {:display-mode :one-d ;; :one-d, :two-d
              :draw-steps 16
@@ -592,7 +591,7 @@
         (zero? (mod t anim-every))))))
 
 (defn timeline-click
-  [e click-dt steps selection opts]
+  [e click-dt steps selection]
   (.stopPropagation e)
   (let [append? (.-metaKey e)
         sel1 {:dt click-dt
@@ -621,12 +620,12 @@
               (recur)))))
 
       :reagent-render
-      (fn [viz-steps selection viz-options]
+      (fn [viz-steps selection capture-options]
         (let [steps @viz-steps
-              opts @viz-options
               sel @selection
               sel-dts (into #{} (map :dt sel))
-              keep-steps (:keep-steps opts)
+              keep-steps (or (:keep-steps @capture-options)
+                             50)
               min-t-width (* (if (pos? (count steps))
                                (count (str (:timestep (first steps))))
                                2)
@@ -661,7 +660,7 @@
                                 :font-size "10px"}
                          kept?
                          (assoc :on-click
-                                #(timeline-click % dt steps selection opts)))
+                                #(timeline-click % dt steps selection)))
                     [:ellipse {:cx x-px :cy y-px
                                :rx (if sel? sel-rx rx)
                                :ry (if sel? sel-ry ry)
