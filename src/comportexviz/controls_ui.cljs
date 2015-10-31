@@ -629,7 +629,7 @@
                                            :data-target "#comportex-navbar-collapse"}
           [:span.icon-bar] [:span.icon-bar] [:span.icon-bar]]
          [:a.navbar-brand {:href "https://github.com/nupic-community/comportexviz"}
-          "ComportexViz"]]
+          "NuPIC"]]
         [:div.collapse.navbar-collapse {:id "comportex-navbar-collapse"}
          [:ul.nav.navbar-nav
           ;; step back
@@ -921,7 +921,7 @@
 (defn comportexviz-app
   [_ _ _ _ selection steps step-template _ _ _ into-journal local-targets]
   (let [show-help (atom false)
-        viz-expanded (atom true)
+        viz-expanded (atom false)
         ;; time-plots-tab (time-plots-tab-builder steps into-journal local-targets)
         ;; cell-sdrs-tab (cell-sdrs-tab-builder steps step-template selection
         ;;                                      into-journal local-targets)

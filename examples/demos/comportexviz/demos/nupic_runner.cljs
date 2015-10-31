@@ -11,16 +11,16 @@
   [steps selection]
   (when (not-empty @steps)
     (let [step (main/selected-step steps selection)]
-      (when (:input-value step)
+      (when-let [display-value (:display-value step)]
         (into [:div]
-              (for [[sense-id v] (:sensed-values step)]
+              (for [[k v] display-value]
                 [:div {:style {:margin-top 20}}
                  [:p
                   [:span {:style {:font-family "sans-serif"
                                   :font-size "9px"
-                                  :font-weight "bold"}} (name sense-id)]
+                                  :font-weight "bold"}} k]
                   [:br]
-                  [:strong (str v)]]]))))))
+                  [:strong v]]]))))))
 
 (defn ^:export init
   []
