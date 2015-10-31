@@ -43,13 +43,11 @@
         client-infos (atom {})
         capture-options (atom {:keep-steps n-keep
                                :ff-synapses {:capture? true
-                                             :active? true
-                                             :disconnected? true
-                                             :inactive? true}
+                                             :min-perm 0.0
+                                             :only-active? false}
                                :distal-synapses {:capture? true
-                                                 :active? true
-                                                 :disconnected? true
-                                                 :inactive? true}})
+                                                 :min-perm 0.0
+                                                 :only-active? false}})
         find-model (fn [id]
                      (when (number? id)
                        (let [i (- id @steps-offset)]

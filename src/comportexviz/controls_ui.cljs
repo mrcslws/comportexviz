@@ -423,28 +423,16 @@
             "Dump entire model to console"])
          ])})))
 
-(def keep-steps-template
-  [:div.panel.panel-default
-   [:div.panel-body
-    [:div
-     [:label " Keep "
-      [:input {:field :numeric
-               :id :keep-steps
-               :size 4}]
-      " steps of history"]]]])
-
 (defn t-chbox
   [id label]
   [:div.checkbox
    [:label
     [:input {:field :checkbox :id id}]
-    (str " " label)]])
+    " "
+    label]])
 
 (def capture-ff-syns-template
-  [:div
-   (t-chbox :ff-synapses.active? "Active")
-   (t-chbox :ff-synapses.inactive? "Inactive")
-   (t-chbox :ff-synapses.disconnected? "Disconnected")])
+  )
 
 (def capture-distal-syns-template
   [:div
@@ -453,47 +441,64 @@
    (t-chbox :distal-synapses.disconnected? "Disconnected")])
 
 (defn capture-tab [capture-options]
-  (let [group (fn [title content]
-                [:div.col-sm-6
-                 [:div.panel.panel-default
-                  [:div.panel-heading
-                   [:h4.panel-title title]]
-                  content]])]
-    (fn [capture-options]
-      (let [{{capture-ff-syns? :capture?} :ff-synapses
-             {capture-distal-syns? :capture?} :distal-synapses} @capture-options]
-        [:div
-         [bind-fields keep-steps-template capture-options]
-         [:p.text-muted "Select the model data to capture."]
-         [:div.col-sm-6 {:style {:padding-left 0}}
-          [:div.panel.panel-default
-           [:div.panel-heading
-            [:h4.panel-title "Feedforward synapses:"]]
-           [:div.panel-body
-            [(if capture-ff-syns?
-               :button.btn.btn-primary
-               :button.btn.btn-default)
-             {:on-click #(swap! capture-options
-                                update-in [:ff-synapses :capture?] not)}
-             (if capture-ff-syns?
-               "Capturing"
-               "Not capturing")]
-            [bind-fields capture-ff-syns-template capture-options]]]]
-         [:div.col-sm-6 {:style {:padding-right 0}}
-          [:div.panel.panel-default
-           [:div.panel-heading
-            [:h4.panel-title "Distal synapses:"]]
-           [:div.panel-body
-            [(if capture-distal-syns?
-               :button.btn.btn-primary
-               :button.btn.btn-default)
-             {:on-click #(swap! capture-options
-                                update-in [:distal-synapses :capture?] not)
-              :style {:margin-right 10}}
-             (if capture-distal-syns?
-               "Capturing"
-               "Not capturing")]
-            [bind-fields capture-distal-syns-template capture-options]]]]]))))
+  (let [{{capture-ff-syns? :capture?} :ff-synapses
+         {capture-distal-syns? :capture?} :distal-synapses} @capture-options]
+    [:div
+     [:p.text-muted {:style {:margin-top 15
+                             :margin-bottom 15}}
+      "Choose data the server should capture."]
+     [:div.row
+      [:div.col-xs-12
+       [:div.panel.panel-default
+        [:div.panel-body
+         [bind-fields [:label {:style {:font-weight "normal"}}
+                       "Keep "
+                       [:input {:field :numeric
+                                :id :keep-steps
+                                :style {:text-align "center"}
+                                :size 4}]
+                       " steps of history"]
+          capture-options]]]]]
+     [:div.row
+      [:div.col-lg-6.col-sm-12
+       [:div.panel.panel-default
+        [:div.panel-heading
+         [:h4.panel-title "Feed-forward synapses"]]
+        [:div.panel-body
+         [bind-fields [:div.form-group
+                       ;; [:label.control-label]
+                       [:label.control-label {:style {:font-weight "normal"}
+                                              :for "ff-synapses.min-perm"}
+                        "If permanence"
+                        ]
+                       [:div.input-group
+                        [:span.input-group-addon "≥"]
+                        [:input.form-control {:field :numeric
+                                              :id :ff-synapses.min-perm
+                                              :size 3}]]
+                       (t-chbox :ff-synapses.capture?
+                                "Save")
+                       (t-chbox :ff-synapses.only-active?
+                                "Only if active")]
+          capture-options]]]]
+      [:div.col-lg-6.col-sm-12
+       [:div.panel.panel-default
+        [:div.panel-heading
+         [:h4.panel-title "Distal synapses"]]
+        [:div.panel-body
+         [bind-fields [:div
+                       [:label {:style {:font-weight "normal"}}
+                        "If permanence"
+                        [:div.input-group
+                         [:span.input-group-addon "≥"]
+                         [:input.form-control {:field :numeric
+                                               :id :distal-synapses.min-perm
+                                               :size 3}]]]
+                       (t-chbox :distal-synapses.capture?
+                                "Save")
+                       (t-chbox :distal-synapses.only-active?
+                                "Only if active")]
+          capture-options]]]]]]))
 
 (def viz-options-template
   (let [chbox (fn [id label]
@@ -502,13 +507,15 @@
                   [:input {:field :checkbox :id id}]
                   (str " " label)]])
         group (fn [title content]
-                [:div.col-sm-6
+                [:div.col-lg-6.col-sm-12
                  [:div.panel.panel-default
                   [:div.panel-heading
                    [:h4.panel-title title]]
                   content]])]
     [:div
-     [:p.text-muted "Select drawing options, with immediate effect."]
+     [:p.text-muted {:style {:margin-top 15
+                             :margin-bottom 15}}
+      "Select drawing options, with immediate effect."]
      [:div.panel.panel-default
       [:div.panel-body
        [:div.radio
@@ -712,7 +719,7 @@
               [:span.sr-only "Un-expand"]]])
           ;; sort/watch/scroll and all-layers option
           [:li
-           [:p.navbar-text "Sort/Watch/Scroll:"]]
+           [:p.navbar-text "Sort/Watch:"]]
           ;; sort selected layer
           [:li
            [:button.btn.btn-default.navbar-btn
@@ -790,51 +797,53 @@
           [:li (if-not @going? {:class "hidden"})
            [:p.navbar-text (str (.toFixed (sim-rate (first @steps) @run-start)
                                           1) "/sec.")]]
-          ;; sim / anim options
-          [:li.dropdown
-           [:a.dropdown-toggle {:data-toggle "dropdown"
-                                :role "button"
-                                :href "#"}
-            "Speed" [:span.caret]]
-           [:ul.dropdown-menu {:role "menu"}
-            [:li [:a {:href "#"
-                      :on-click (fn []
-                                  (put! into-sim [:set-step-ms 0])
-                                  (swap! viz-options assoc-in
-                                         [:drawing :anim-every] 1))}
-                  "max sim speed"]]
-            [:li [:a {:href "#"
-                      :on-click (fn []
-                                  (put! into-sim [:set-step-ms 0])
-                                  (swap! viz-options assoc-in
-                                         [:drawing :anim-every] 100))}
-                  "max sim speed, draw every 100 steps"]]
-            [:li [:a {:href "#"
-                      :on-click (fn []
-                                  (put! into-sim [:set-step-ms 250])
-                                  (swap! viz-options assoc-in
-                                         [:drawing :anim-every] 1))}
-                  "limit to 4 steps/sec."]]
-            [:li [:a {:href "#"
-                      :on-click (fn []
-                                  (put! into-sim [:set-step-ms 500])
-                                  (swap! viz-options assoc-in
-                                         [:drawing :anim-every] 1))}
-                  "limit to 2 steps/sec."]]
-            [:li [:a {:href "#"
-                      :on-click (fn []
-                                  (put! into-sim [:set-step-ms 1000])
-                                  (swap! viz-options assoc-in
-                                         [:drawing :anim-every] 1))}
-                  "limit to 1 step/sec."]]]]
-          [:li (if @show-help {:class "active"})
-           [:a {:href "#"
-                :on-click (fn [e]
-                            (swap! show-help not)
-                            (.preventDefault e))}
-            "Help"]]
-          ]
-         ]
+          ;; ;; sim / anim options
+          ;; [:li.dropdown
+          ;;  [:a.dropdown-toggle {:data-toggle "dropdown"
+          ;;                       :role "button"
+          ;;                       :href "#"}
+          ;;   "Speed" [:span.caret]]
+          ;;  [:ul.dropdown-menu {:role "menu"}
+          ;;   [:li [:a {:href "#"
+          ;;             :on-click (fn []
+          ;;                         (put! into-sim [:set-step-ms 0])
+          ;;                         (swap! viz-options assoc-in
+          ;;                                [:drawing :anim-every] 1))}
+          ;;         "max sim speed"]]
+          ;;   [:li [:a {:href "#"
+          ;;             :on-click (fn []
+          ;;                         (put! into-sim [:set-step-ms 0])
+          ;;                         (swap! viz-options assoc-in
+          ;;                                [:drawing :anim-every] 100))}
+          ;;         "max sim speed, draw every 100 steps"]]
+          ;;   [:li [:a {:href "#"
+          ;;             :on-click (fn []
+          ;;                         (put! into-sim [:set-step-ms 250])
+          ;;                         (swap! viz-options assoc-in
+          ;;                                [:drawing :anim-every] 1))}
+          ;;         "limit to 4 steps/sec."]]
+          ;;   [:li [:a {:href "#"
+          ;;             :on-click (fn []
+          ;;                         (put! into-sim [:set-step-ms 500])
+          ;;                         (swap! viz-options assoc-in
+          ;;                                [:drawing :anim-every] 1))}
+          ;;         "limit to 2 steps/sec."]]
+          ;;   [:li [:a {:href "#"
+          ;;             :on-click (fn []
+          ;;                         (put! into-sim [:set-step-ms 1000])
+          ;;                         (swap! viz-options assoc-in
+          ;;                                [:drawing :anim-every] 1))}
+          ;;         "limit to 1 step/sec."]]]]
+          [:li
+           [:button.btn.btn-default.navbar-btn
+            (cond-> {:type :button
+                     :on-click (fn [e]
+                                 (swap! show-help not)
+                                 (.preventDefault e))
+                     :title "Help"}
+              @show-help (assoc :class "active"))
+            [:span.glyphicon.glyphicon-question-sign {:aria-hidden "true"}]
+            [:span.visible-xs-inline " Help"]]]]]
         ]])))
 
 (defn tabs

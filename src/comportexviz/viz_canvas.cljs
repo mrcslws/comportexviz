@@ -652,10 +652,10 @@
               sel-dts (into #{} (map :dt sel))
               keep-steps (or (:keep-steps @capture-options)
                              50)
-              min-t-width (* (if (pos? (count steps))
-                               (count (str (:timestep (first steps))))
-                               2)
-                             8)
+              min-t-width (* (cond-> 2
+                               (pos? (count steps))
+                               (max (count (str (:timestep (first steps))))))
+                             12)
               t-width (max (/ @container-width-px keep-steps)
                            min-t-width)
               width-px (* t-width keep-steps)
@@ -684,7 +684,7 @@
                    [:g (cond-> {:text-anchor "middle"
                                 :font-family "sans-serif"
                                 :font-weight "bold"
-                                :font-size "10px"}
+                                :font-size "11px"}
                          kept?
                          (assoc :on-click
                                 #(timeline-click % dt steps selection)))
@@ -692,7 +692,7 @@
                                :rx (if sel? sel-rx rx)
                                :ry (if sel? sel-ry ry)
                                :fill "black"
-                               :fill-opacity (cond sel? 1.0 kept? 0.3 :else 0.1)}]
+                               :fill-opacity (cond sel? 1.0 kept? 0.5 :else 0.1)}]
                     (when (and (pos? (count steps))
                                (or sel?
                                    (and kept? (< keep-steps 100))))
