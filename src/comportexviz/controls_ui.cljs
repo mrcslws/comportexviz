@@ -431,74 +431,68 @@
     " "
     label]])
 
-(def capture-ff-syns-template
-  )
-
-(def capture-distal-syns-template
-  [:div
-   (t-chbox :distal-synapses.active? "Active")
-   (t-chbox :distal-synapses.inactive? "Inactive")
-   (t-chbox :distal-synapses.disconnected? "Disconnected")])
-
 (defn capture-tab [capture-options]
-  (let [{{capture-ff-syns? :capture?} :ff-synapses
-         {capture-distal-syns? :capture?} :distal-synapses} @capture-options]
-    [:div
-     [:p.text-muted {:style {:margin-top 15
-                             :margin-bottom 15}}
-      "Choose data the server should capture."]
-     [:div.row
-      [:div.col-xs-12
-       [:div.panel.panel-default
-        [:div.panel-body
-         [bind-fields [:label {:style {:font-weight "normal"}}
-                       "Keep "
+  [:div
+   [:p.text-muted {:style {:margin-top 15
+                           :margin-bottom 15}}
+    "Choose data the server should capture."]
+   [:div.row
+    [:div.col-xs-12
+     [:div.panel.panel-default
+      [:div.panel-body
+       [bind-fields [:label {:style {:font-weight "normal"}}
+                     "Keep "
+                     [:input {:field :numeric
+                              :id :keep-steps
+                              :style {:text-align "center"}
+                              :size 4}]
+                     " steps of history"]
+        capture-options]]]]]
+   [:div.row
+    [:div.col-lg-6.col-sm-12
+     [:div.panel.panel-default
+      [:div.panel-heading
+       [:h4.panel-title "Feed-forward synapses"]]
+      [:div.panel-body
+       [bind-fields [:div
+                     [:label {:style {:display "block"
+                                      :font-weight "normal"}}
+                      "If permanence "
+                      [:div {:style {:display "inline-block"}}
+                       "≥ "
                        [:input {:field :numeric
-                                :id :keep-steps
-                                :style {:text-align "center"}
-                                :size 4}]
-                       " steps of history"]
-          capture-options]]]]]
-     [:div.row
-      [:div.col-lg-6.col-sm-12
-       [:div.panel.panel-default
-        [:div.panel-heading
-         [:h4.panel-title "Feed-forward synapses"]]
-        [:div.panel-body
-         [bind-fields [:div.form-group
-                       ;; [:label.control-label]
-                       [:label.control-label {:style {:font-weight "normal"}
-                                              :for "ff-synapses.min-perm"}
-                        "If permanence"
-                        ]
-                       [:div.input-group
-                        [:span.input-group-addon "≥"]
-                        [:input.form-control {:field :numeric
-                                              :id :ff-synapses.min-perm
-                                              :size 3}]]
-                       (t-chbox :ff-synapses.capture?
-                                "Save")
-                       (t-chbox :ff-synapses.only-active?
-                                "Only if active")]
-          capture-options]]]]
-      [:div.col-lg-6.col-sm-12
-       [:div.panel.panel-default
-        [:div.panel-heading
-         [:h4.panel-title "Distal synapses"]]
-        [:div.panel-body
-         [bind-fields [:div
-                       [:label {:style {:font-weight "normal"}}
-                        "If permanence"
-                        [:div.input-group
-                         [:span.input-group-addon "≥"]
-                         [:input.form-control {:field :numeric
-                                               :id :distal-synapses.min-perm
-                                               :size 3}]]]
-                       (t-chbox :distal-synapses.capture?
-                                "Save")
-                       (t-chbox :distal-synapses.only-active?
-                                "Only if active")]
-          capture-options]]]]]]))
+                                :id :ff-synapses.min-perm
+                                :size 3
+                                :style {:text-align "center"}}]]]
+                     (t-chbox :ff-synapses.capture?
+                              "Save")
+                     [:div {:field :container
+                            :visible? #(get-in % [:ff-synapses :capture?])}
+                      (t-chbox :ff-synapses.only-active?
+                               "Only if active")]]
+        capture-options]]]]
+    [:div.col-lg-6.col-sm-12
+     [:div.panel.panel-default
+      [:div.panel-heading
+       [:h4.panel-title "Distal synapses"]]
+      [:div.panel-body
+       [bind-fields [:div
+                     [:label {:style {:display "block"
+                                      :font-weight "normal"}}
+                      "If permanence "
+                      [:div {:style {:display "inline-block"}}
+                       "≥ "
+                       [:input {:field :numeric
+                                :id :distal-synapses.min-perm
+                                :size 3
+                                :style {:text-align "center"}}]]]
+                     (t-chbox :distal-synapses.capture?
+                              "Save")
+                     [:div {:field :container
+                            :visible? #(get-in % [:distal-synapses :capture?])}
+                      (t-chbox :distal-synapses.only-active?
+                               "Only if active")]]
+        capture-options]]]]]])
 
 (def viz-options-template
   (let [chbox (fn [id label]
