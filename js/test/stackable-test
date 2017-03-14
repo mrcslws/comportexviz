@@ -1,0 +1,9 @@
+var tape = require("tape"),
+    baz = require("../");
+
+tape("baz.insertSimpleD3Histogram is defined", function(test) {
+  if (!baz.insertSimpleD3Histogram) {
+    test.error("It's not defined!");
+  }
+  test.end();
+});

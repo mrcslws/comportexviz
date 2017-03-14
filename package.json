@@ -1,0 +1,29 @@
+{
+  "name": "sanity",
+  "version": "0.0.1",
+  "description": "",
+  "keywords": [],
+  "license": "BSD-3-Clause",
+  "main": "build/stackable-bundle.js",
+  "jsnext:main": "js/index",
+  "homepage": "https://github.com/htm-community/sanity",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/htm-community/sanity"
+  },
+  "scripts": {
+    "pretest": "rm -rf build && mkdir build && rollup -c -f umd -n stackable -o build/stackable-bundle.js -- js/index.js && mkdir -p public/stackable-out && cp build/stackable-bundle.js public/stackable-out/stackable-bundle.js",
+    "test": "tape 'js/test/**/*-test.js'",
+    "prepublish": "npm run test",
+    "postpublish": "zip -j build/stackable.zip -- LICENSE README.md build/stackable-bundle.js && cp build/stackable-bundle.js public/stackable-out/stackable-bundle.js"
+  },
+  "devDependencies": {
+    "rollup": "0.41.4",
+    "rollup-plugin-node-resolve": "^2.0.0",
+    "tape": "4",
+    "uglify-js": "2"
+  },
+  "dependencies": {
+    "d3": "^4.7.3"
+  }
+}

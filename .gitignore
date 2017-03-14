@@ -21,3 +21,6 @@ sanity*.js
 sanity.iml
 /data
 /log
+/node_modules
+/build
+/public/stackable-out
